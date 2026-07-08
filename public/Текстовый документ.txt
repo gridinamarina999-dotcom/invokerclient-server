@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InvokerClient - Профессиональное решение</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #0a0e27;
+            color: #e0e0e0;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 40px;
+            background: rgba(10, 14, 39, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(100, 200, 255, 0.1);
+        }
+
+        nav .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #64c8ff, #0ea5e9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: #64c8ff;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #64c8ff;
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-login {
+            padding: 10px 24px;
+            background: transparent;
+            color: #64c8ff;
+            border: 1px solid #64c8ff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-login:hover {
+            background: rgba(100, 200, 255, 0.1);
+        }
+
+        .btn-signup {
+            padding: 10px 24px;
+            background: linear-gradient(135deg, #64c8ff, #0ea5e9);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(100, 200, 255, 0.2);
+        }
+
+        .btn-signup:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(100, 200, 255, 0.3);
+        }
+
+        .user-info {
+            display: none;
+            align-items: center;
+            gap: 15px;
+            color: #64c8ff;
+        }
+
+        .user-info.show {
+            display: flex;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .btn-logout {
+            padding: 8px 16px;
+            background: transparent;
+            color: #ef4444;
+            border: 1px solid #ef4444;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-logout:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(10, 14, 39, 0.98) 0%, rgba(20, 30, 60, 0.98) 100%);
+            margin: 10% auto;
+            padding: 40px;
+            border: 1px solid rgba(100, 200, 255, 0.2);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-close {
+            color: #a0a0a0;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: #64c8ff;
+        }
+
+        .modal-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #ffffff;
+            background: linear-gradient(135deg, #ffffff 0%, #64c8ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .modal-subtitle {
+            color: #a0a0a0;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #e0e0e0;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(100, 200, 255, 0.2);
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #64c8ff;
+            background: rgba(100, 200, 255, 0.05);
+            box-shadow: 0 0 0 3px rgba(100, 200, 255, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: #606060;
+        }
+
+        .password-toggle {
+            position: relative;
+        }
+
+        .password-toggle-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #64c8ff;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 5px;
+            margin-top: 20px;
+        }
+
+        .modal-form-btn {
+            width: 100%;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #64c8ff, #0ea5e9);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 24px rgba(100, 200, 255, 0.3);
+        }
+
+        .modal-form-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(100, 200, 255, 0.4);
+        }
+
+        .modal-form-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .form-toggle {
+            text-align: center;
+            margin-top: 20px;
+            color: #a0a0a0;
+            font-size: 14px;
+        }
+
+        .form-toggle a {
+            color: #64c8ff;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .form-toggle a:hover {
+            text-decoration: underline;
+        }
+
+        .success-message {
+            display: none;
+            padding: 16px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid #22c55e;
+            border-radius: 8px;
+            color: #86efac;
+            text-align: center;
+            margin-bottom: 20px;
+            animation: slideDown 0.3s ease;
+        }
+
+        .error-message {
+            display: none;
+            padding: 16px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+            border-radius: 8px;
+            color: #fca5a5;
+            text-align: center;
+            margin-bottom: 20px;
+            animation: slideDown 0.3s ease;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 16px;
+            color: #64c8ff;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(10, 14, 39, 1) 0%, rgba(20, 30, 60, 0.5) 100%);
+            position: relative;
+            overflow: hidden;
+            margin-top: 60px;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(100, 200, 255, 0.15) 0%, transparent 70%);
+            top: -200px;
+            right: -200px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(14, 165, 233, 0.1) 0%, transparent 70%);
+            bottom: -200px;
+            left: -200px;
+            animation: float 8s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(20px); }
+        }
+
+        .hero-content {
+            max-width: 900px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            padding: 0 20px;
+        }
+
+        .hero-content h1 {
+            font-size: 72px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.2;
+            background: linear-gradient(135deg, #ffffff 0%, #64c8ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-content p {
+            font-size: 20px;
+            color: #a0a0a0;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 16px 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #64c8ff, #0ea5e9);
+            color: white;
+            box-shadow: 0 8px 24px rgba(100, 200, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(100, 200, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #64c8ff;
+            border: 2px solid #64c8ff;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(100, 200, 255, 0.1);
+            transform: translateY(-4px);
+        }
+
+        /* Features Section */
+        .features {
+            max-width: 1400px;
+            margin: 120px auto;
+            padding: 0 40px;
+        }
+
+        .section-title {
+            font-size: 48px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 80px;
+            background: linear-gradient(135deg, #ffffff 0%, #64c8ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, rgba(100, 200, 255, 0.05) 0%, rgba(14, 165, 233, 0.05) 100%);
+            border: 1px solid rgba(100, 200, 255, 0.2);
+            padding: 40px;
+            border-radius: 12px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #64c8ff, #0ea5e9);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            border-color: rgba(100, 200, 255, 0.5);
+            background: linear-gradient(135deg, rgba(100, 200, 255, 0.1) 0%, rgba(14, 165, 233, 0.1) 100%);
+            transform: translateY(-8px);
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #64c8ff, #0ea5e9);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #ffffff;
+        }
+
+        .feature-card p {
+            color: #a0a0a0;
+            line-height: 1.6;
+        }
+
+        /* Stats Section */
+        .stats {
+            background: linear-gradient(135deg, rgba(10, 14, 39, 1) 0%, rgba(20, 30, 60, 0.5) 100%);
+            padding: 120px 40px;
+            margin: 120px 0;
+        }
+
+        .stats-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 60px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 48px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #64c8ff, #0ea5e9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #a0a0a0;
+            font-size: 16px;
+        }
+
+        /* Pricing Section */
+        .pricing {
+            max-width: 1400px;
+            margin: 120px auto;
+            padding: 0 40px;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .pricing-card {
+            background: linear-gradient(135deg, rgba(100, 200, 255, 0.05) 0%, rgba(14, 165, 233, 0.05) 100%);
+            border: 1px solid rgba(100, 200, 255, 0.2);
+            padding: 50px 40px;
+            border-radius: 12px;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .pricing-card.featured {
+            border-color: #64c8ff;
+            background: linear-gradient(135deg, rgba(100, 200, 255, 0.1) 0%, rgba(14, 165, 233, 0.1) 100%);
+            transform: scale(1.05);
+        }
+
+        .pricing-card:hover {
+            border-color: rgba(100, 200, 255, 0.5);
+            background: linear-gradient(135deg, rgba(100, 200, 255, 0.15) 0%, rgba(14, 165, 233, 0.15) 100%);
+        }
+
+        .pricing-name {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #ffffff;
+        }
+
+        .pricing-price {
+            font-size: 48px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #64c8ff, #0ea5e9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 30px;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 40px;
+        }
+
+        .pricing-features li {
+            color: #a0a0a0;
+            margin-bottom: 15px;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .pricing-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #64c8ff;
+            font-weight: bold;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, rgba(100, 200, 255, 0.1) 0%, rgba(14, 165, 233, 0.1) 100%);
+            border: 1px solid rgba(100, 200, 255, 0.2);
+            margin: 120px 40px;
+            padding: 80px 40px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-section h2 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #ffffff 0%, #64c8ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .cta-section p {
+            font-size: 20px;
+            color: #a0a0a0;
+            margin-bottom: 40px;
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(10, 14, 39, 0.8);
+            border-top: 1px solid rgba(100, 200, 255, 0.1);
+            padding: 60px 40px 20px;
+            margin-top: 120px;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h3 {
+            color: #ffffff;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .footer-section p {
+            color: #a0a0a0;
+            line-height: 1.6;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 12px;
+        }
+
+        .footer-section a {
+            color: #a0a0a0;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: #64c8ff;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(100, 200, 255, 0.1);
+            padding-top: 30px;
+            text-align: center;
+            color: #606060;
+            font-size: 14px;
+        }
+
+        /* Scroll animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-content h1 {
+                font-size: 48px;
+            }
+
+            .hero-content p {
+                font-size: 16px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .section-title {
+                font-size: 36px;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .pricing-card.featured {
+                transform: scale(1);
+            }
+
+            .cta-section {
+                margin: 60px 20px;
+                padding: 40px 20px;
+            }
+
+            .cta-section h2 {
+                font-size: 32px;
+            }
+
+            .modal-content {
+                margin: 20% auto;
+                width: 90%;
+                max-width: 450px;
+            }
+
+            .auth-buttons {
+                gap: 10px;
+            }
+
+            .btn-login, .btn-signup {
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+
+            .user-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <div class="logo">InvokerClient</div>
+            <div class="nav-right">
+                <ul class="nav-links">
+                    <li><a href="#features">Возможности</a></li>
+                    <li><a href="#pricing">Цены</a></li>
+                    <li><a href="#about">О нас</a></li>
+                    <li><a href="#contact">Контакты</a></li>
+                </ul>
+                <div class="auth-buttons" id="authButtons">
+                    <button class="btn-login" onclick="openLoginModal()">🔓 Вход</button>
+                    <button class="btn-signup" onclick="openSignupModal()">📝 Регистрация</button>
+                </div>
+                <div class="user-info" id="userInfo">
+                    <span class="user-name" id="userName"></span>
+                    <button class="btn-logout" onclick="handleLogout()">Выход</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeLoginModal()">&times;</span>
+            <h2 class="modal-title">Вход</h2>
+            <p class="modal-subtitle">Войдите в свой аккаунт</p>
+            
+            <div id="loginError" class="error-message"></div>
+            <div id="loginSuccess" class="success-message"></div>
+            <div id="loginLoading" class="loading">⏳ Загрузка...</div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input 
+                        type="email" 
+                        id="loginEmail" 
+                        placeholder="ваш@email.com" 
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="loginPassword">Пароль</label>
+                    <div class="password-toggle">
+                        <input 
+                            type="password" 
+                            id="loginPassword" 
+                            placeholder="••••••••" 
+                            required
+                        >
+                        <button 
+                            type="button" 
+                            class="password-toggle-btn" 
+                            onclick="togglePassword('loginPassword')"
+                        >👁️</button>
+                    </div>
+                </div>
+
+                <button type="submit" class="modal-form-btn">Войти</button>
+            </form>
+
+            <div class="form-toggle">
+                Нет аккаунта? <a onclick="switchToSignup()">Создать профиль</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signupModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeSignupModal()">&times;</span>
+            <h2 class="modal-title">Регистрация</h2>
+            <p class="modal-subtitle">Создайте новый аккаунт</p>
+            
+            <div id="signupError" class="error-message"></div>
+            <div id="signupSuccess" class="success-message"></div>
+            <div id="signupLoading" class="loading">⏳ Загрузка...</div>
+
+            <form id="signupForm" onsubmit="handleSignup(event)">
+                <div class="form-group">
+                    <label for="signupName">Полное имя</label>
+                    <input 
+                        type="text" 
+                        id="signupName" 
+                        placeholder="Иван Иванов" 
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input 
+                        type="email" 
+                        id="signupEmail" 
+                        placeholder="ваш@email.com" 
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="signupPassword">Пароль</label>
+                    <div class="password-toggle">
+                        <input 
+                            type="password" 
+                            id="signupPassword" 
+                            placeholder="••••••••" 
+                            required
+                        >
+                        <button 
+                            type="button" 
+                            class="password-toggle-btn" 
+                            onclick="togglePassword('signupPassword')"
+                        >👁️</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="signupConfirmPassword">Подтвердите пароль</label>
+                    <div class="password-toggle">
+                        <input 
+                            type="password" 
+                            id="signupConfirmPassword" 
+                            placeholder="••••••••" 
+                            required
+                        >
+                        <button 
+                            type="button" 
+                            class="password-toggle-btn" 
+                            onclick="togglePassword('signupConfirmPassword')"
+                        >👁️</button>
+                    </div>
+                </div>
+
+                <button type="submit" class="modal-form-btn">Создать аккаунт</button>
+            </form>
+
+            <div class="form-toggle">
+                Уже есть аккаунт? <a onclick="switchToLogin()">Войти</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>InvokerClient</h1>
+            <p>Мощное решение для управления клиентами и автоматизации бизнес-процессов</p>
+            <div class="cta-buttons">
+                <button class="btn btn-primary" onclick="openSignupModal()">Начать бесплатно</button>
+                <button class="btn btn-secondary" onclick="document.getElementById('features').scrollIntoView({behavior: 'smooth'})">Узнать больше</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <h2 class="section-title">Основные возможности</h2>
+        <div class="features-grid">
+            <div class="feature-card fade-in">
+                <div class="feature-icon">⚡</div>
+                <h3>Высокая скорость</h3>
+                <p>Молниеносная обработка данных и мгновенные результаты. Оптимизированная архитектура для максимальной производительности.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon">🔒</div>
+                <h3>Безопасность</h3>
+                <p>Защита данных на уровне банковского стандарта. Шифрование end-to-end и многоуровневая аутентификация.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon">📊</div>
+                <h3>Аналитика</h3>
+                <p>Подробные отчеты и визуализация данных. Интерактивные дашборды для принятия решений.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon">🤖</div>
+                <h3>Автоматизация</h3>
+                <p>Автоматизация рутинных задач. Экономия времени и повышение эффективности работы команды.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon">🌐</div>
+                <h3>Интеграции</h3>
+                <p>Легко интегрируется с популярными сервисами. API для разработки собственных расширений.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon">👥</div>
+                <h3>Командная работа</h3>
+                <p>Удобное сотрудничество команды в реальном времени. Управление ролями и правами доступа.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="stats-container">
+            <div class="stat-item fade-in">
+                <div class="stat-number" id="userCount">0</div>
+                <div class="stat-label">Активных пользователей</div>
+            </div>
+            <div class="stat-item fade-in">
+                <div class="stat-number">99.9%</div>
+                <div class="stat-label">Надежность системы</div>
+            </div>
+            <div class="stat-item fade-in">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Техническая поддержка</div>
+            </div>
+            <div class="stat-item fade-in">
+                <div class="stat-number">50+</div>
+                <div class="stat-label">Интеграций готовых</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing" id="pricing">
+        <h2 class="section-title">Наши тарифы</h2>
+        <div class="pricing-grid">
+            <div class="pricing-card fade-in">
+                <div class="pricing-name">Базовый</div>
+                <div class="pricing-price">499₽</div>
+                <p style="color: #a0a0a0; margin-bottom: 30px;">в месяц</p>
+                <ul class="pricing-features">
+                    <li>До 100 клиентов</li>
+                    <li>Базовая аналитика</li>
+                    <li>Email поддержка</li>
+                    <li>API доступ</li>
+                </ul>
+                <button class="btn btn-primary" style="width: 100%;" onclick="openSignupModal()">Выбрать план</button>
+            </div>
+            <div class="pricing-card featured fade-in">
+                <div class="pricing-name">Профессиональный</div>
+                <div class="pricing-price">1499₽</div>
+                <p style="color: #a0a0a0; margin-bottom: 30px;">в месяц</p>
+                <ul class="pricing-features">
+                    <li>Неограниченно клиентов</li>
+                    <li>Продвинутая аналитика</li>
+                    <li>Приоритетная поддержка</li>
+                    <li>Пользовательские интеграции</li>
+                    <li>Автоматизация процессов</li>
+                </ul>
+                <button class="btn btn-primary" style="width: 100%;" onclick="openSignupModal()">Выбрать план</button>
+            </div>
+            <div class="pricing-card fade-in">
+                <div class="pricing-name">Премиум</div>
+                <div class="pricing-price">4999₽</div>
+                <p style="color: #a0a0a0; margin-bottom: 30px;">в месяц</p>
+                <ul class="pricing-features">
+                    <li>Все из Профессионального</li>
+                    <li>Личный менеджер</li>
+                    <li>Белая метка (White Label)</li>
+                    <li>Выделенный сервер</li>
+                    <li>Консультации по стратегии</li>
+                </ul>
+                <button class="btn btn-primary" style="width: 100%;" onclick="openSignupModal()">Выбрать план</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section fade-in">
+        <h2>Готовы начать?</h2>
+        <p>Присоединитесь к тысячам компаний, которые уже используют InvokerClient</p>
+        <button class="btn btn-primary" onclick="openSignupModal()">Начать бесплатный период</button>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>InvokerClient</h3>
+                <p>Профессиональное решение для управления клиентами и автоматизации бизнес-процессов.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Продукт</h3>
+                <ul>
+                    <li><a href="#features">Возможности</a></li>
+                    <li><a href="#pricing">Цены</a></li>
+                    <li><a href="#">Безопасность</a></li>
+                    <li><a href="#">Статус сервиса</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Компания</h3>
+                <ul>
+                    <li><a href="#">О нас</a></li>
+                    <li><a href="#">Блог</a></li>
+                    <li><a href="#">Карьера</a></li>
+                    <li><a href="#">Контакты</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Поддержка</h3>
+                <ul>
+                    <li><a href="#">Справка</a></li>
+                    <li><a href="#">Документация</a></li>
+                    <li><a href="#">Статьи</a></li>
+                    <li><a href="mailto:support@invokerclient.ru">support@invokerclient.ru</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 InvokerClient. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script>
+        const API_URL = 'http://localhost:5000';
+
+        // ============ ПРОВЕРКА АВТОРИЗАЦИИ ============
+        window.addEventListener('DOMContentLoaded', () => {
+            checkUserStatus();
+            loadStats();
+        });
+
+        function checkUserStatus() {
+            const user = localStorage.getItem('invokerclient_currentUser');
+            const authButtons = document.getElementById('authButtons');
+            const userInfo = document.getElementById('userInfo');
+
+            if (user) {
+                const userData = JSON.parse(user);
+                authButtons.style.display = 'none';
+                userInfo.classList.add('show');
+                document.getElementById('userName').textContent = `👤 ${userData.name}`;
+            } else {
+                authButtons.style.display = 'flex';
+                userInfo.classList.remove('show');
+            }
+        }
+
+        // ============ МОДАЛЬНЫЕ ОКНА ============
+        function openLoginModal() {
+            document.getElementById('loginModal').style.display = 'block';
+            document.getElementById('signupModal').style.display = 'none';
+            
