@@ -57,7 +57,6 @@
             pointer-events: none;
         }
 
-        /* Контент поверх звезд */
         nav, .page, .modal { position: relative; z-index: 10; }
 
         nav { 
@@ -420,6 +419,91 @@
             box-shadow: 0 8px 20px rgba(100, 200, 255, 0.3);
         }
 
+        /* FAQ Section */
+        .faq-section { margin: 100px 0; text-align: center; }
+        
+        .faq-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin-top: 60px; }
+        
+        .faq-card { 
+            background: linear-gradient(135deg, rgba(100, 200, 255, 0.05) 0%, rgba(14, 165, 233, 0.05) 100%);
+            border: 1px solid rgba(100, 200, 255, 0.2); 
+            border-radius: 12px;
+            transition: all 0.3s; 
+            animation: slideUp 0.8s ease forwards;
+            opacity: 0;
+            overflow: hidden;
+        }
+
+        .faq-card:nth-child(1) { animation-delay: 0.1s; }
+        .faq-card:nth-child(2) { animation-delay: 0.2s; }
+        .faq-card:nth-child(3) { animation-delay: 0.3s; }
+        .faq-card:nth-child(4) { animation-delay: 0.4s; }
+        .faq-card:nth-child(5) { animation-delay: 0.5s; }
+        .faq-card:nth-child(6) { animation-delay: 0.6s; }
+        .faq-card:nth-child(7) { animation-delay: 0.7s; }
+        .faq-card:nth-child(8) { animation-delay: 0.8s; }
+        .faq-card:nth-child(9) { animation-delay: 0.9s; }
+        .faq-card:nth-child(10) { animation-delay: 1s; }
+        
+        .faq-card:hover {
+            border-color: #64c8ff;
+            background: linear-gradient(135deg, rgba(100, 200, 255, 0.1) 0%, rgba(14, 165, 233, 0.1) 100%);
+            box-shadow: 0 10px 30px rgba(100, 200, 255, 0.2);
+            transform: translateY(-5px);
+        }
+        
+        .faq-question { 
+            padding: 25px; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center;
+            gap: 15px;
+            user-select: none;
+            transition: all 0.3s;
+        }
+
+        .faq-question:hover {
+            background: rgba(100, 200, 255, 0.05);
+        }
+        
+        .faq-icon {
+            font-size: 24px;
+            transition: transform 0.3s;
+            min-width: 30px;
+        }
+
+        .faq-card.active .faq-icon {
+            transform: rotate(45deg);
+        }
+        
+        .faq-question h3 { 
+            color: #64c8ff; 
+            font-size: 18px; 
+            text-align: left;
+            margin: 0;
+            flex: 1;
+        }
+        
+        .faq-answer { 
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding: 0 25px;
+        }
+
+        .faq-card.active .faq-answer {
+            max-height: 500px;
+            padding: 0 25px 25px 25px;
+        }
+        
+        .faq-answer p { 
+            color: #a0a0a0; 
+            line-height: 1.8;
+            text-align: left;
+            margin: 0;
+            animation: fadeIn 0.3s ease;
+        }
+
         /* Modal */
         .modal { 
             display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; 
@@ -581,6 +665,7 @@
             .form-row { grid-template-columns: 1fr; }
             .features-grid { grid-template-columns: 1fr; }
             .pricing-grid { grid-template-columns: 1fr; }
+            .faq-grid { grid-template-columns: 1fr; }
             .pricing-card.popular { transform: scale(1); }
             .users-table { font-size: 12px; }
             .support-options { grid-template-columns: 1fr; }
@@ -598,6 +683,7 @@
             <div class="nav-center">
                 <a onclick="showPage('home')">Главная</a>
                 <a onclick="showPage('pricing')">💰 Цены</a>
+                <a onclick="showPage('faq')">❓ Вопросы и ответы</a>
                 <a id="navDashboard" onclick="showPage('dashboard')" style="display: none;">📊 Панель</a>
                 <a id="navProfile" onclick="showPage('profile')" style="display: none;">👤 Профиль</a>
                 <a href="https://discord.gg/vsWg2xWd" target="_blank">🎮 Наш Discord</a>
@@ -824,6 +910,128 @@
         </div>
     </div>
 
+    <!-- FAQ PAGE -->
+    <div id="faqPage" class="page">
+        <div class="container">
+            <section class="faq-section">
+                <h2 class="section-title">❓ Часто задаваемые вопросы</h2>
+                <p style="color: #a0a0a0; font-size: 18px; margin-bottom: 50px; text-align: center;">Найдите ответы на популярные вопросы</p>
+                
+                <div class="faq-grid">
+                    <!-- FAQ 1 -->
+                    <div class="faq-card">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span class="faq-icon">➕</span>
+                            <h3>Как начать пользоваться InvokerClient?</h3>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Просто зарегистрируйтесь на сайте, выберите подходящий тариф и начните использовать все возможности CRM-системы. Вам будет доступна полная инструкция при регистрации.</p>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 2 -->
+                    <div class="faq-card">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span class="faq-icon">➕</span>
+                            <h3>Какой тариф выбрать для начинающих?</h3>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Для начинающих рекомендуем тариф "Trial" на 1 день (300₽) - это позволит вам протестировать все функции. Если понравится, переходите на "Стандарт" (1000₽ на неделю).</p>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 3 -->
+                    <div class="faq-card">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span class="faq-icon">➕</span>
+                            <h3>Как оплатить подписку?</h3>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Оплата производится через нашу поддержку. После выбора тариф свяжитесь с нами через Telegram (@crokodilus) или Discord (https://discord.gg/vsWg2xWd). Мы поможим с оплатой и активацией доступа.</p>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 4 -->
+                    <div class="faq-card">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span class="faq-icon">➕</span>
+                            <h3>Могу ли я отменить подписку?</h3>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Да, вы можете отменить подписку в любой момент. Напишите нам в поддержку и мы поможим с отменой. Неиспользованные дни не возвращаются.</p>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 5 -->
+                    <div class="faq-card">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span class="faq-icon">➕</span>
+                            <h3>Какие данные я могу хранить в системе?</h3>
+                        </div>
+                        <div class="faq-answer">
+                            <p>В InvokerClient вы можете хранить информацию о клиентах, историю взаимодействий, контакты, заметки и другую информацию для управления вашим бизнесом. Все данные защищены и зашифрованы.</p>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 6 -->
+                    <div class="faq-card">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span class="faq-icon">➕</span>
+                            <h3>Есть ли бесплатный пробный период?</h3>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Да! Тариф "Trial" на 1 день (300₽) - это полный доступ ко всем функциям на 24 часа. Идеально подходит для тестирования перед покупкой полного доступа.</p>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 7 -->
+                    <div class="faq-card">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span class="faq-icon">➕</span>
+                            <h3>Могу ли я экспортировать свои данные?</h3>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Да, вы можете экспортировать все свои данные в формате CSV или Excel. Это доступно в личном кабинете в разделе "Экспорт данных".</p>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 8 -->
+                    <div class="faq-card">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span class="faq-icon">➕</span>
+                            <h3>Как я могу получить поддержку?</h3>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Мы доступны 24/7! Свяжитесь с нами через Telegram (быстрый ответ) или Discord (сообщество). Нажмите на кнопку "🆘 Поддержка" в верхнем меню.</p>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 9 -->
+                    <div class="faq-card">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span class="faq-icon">➕</span>
+                            <h3>Могу ли я пригласить команду?</h3>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Да! На тарифе "Премиум" вы можете добавлять членов команды и делегировать задачи. Каждому члену команды будет свой аккаунт с настроенными правами доступа.</p>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 10 -->
+                    <div class="faq-card">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <span class="faq-icon">➕</span>
+                            <h3>Какие способы оплаты вы принимаете?</h3>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Мы принимаем платежи через Yandex.Kassa, банковские переводы и другие способы. Свяжитесь с поддержкой для выбора удобного способа оплаты.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
     <!-- DASHBOARD PAGE (только для админов) -->
     <div id="dashboardPage" class="page">
         <div class="container">
@@ -908,7 +1116,6 @@
         function createStarfield() {
             const starfield = document.getElementById('starfield');
             
-            // Создаем звезды
             for (let i = 0; i < 100; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
@@ -918,7 +1125,6 @@
                 starfield.appendChild(star);
             }
 
-            // Создаем падающие звезды каждые 3 секунды
             setInterval(() => {
                 const shootingStar = document.createElement('div');
                 shootingStar.className = 'shooting-star';
@@ -931,7 +1137,6 @@
             }, 3000);
         }
 
-        // ====== ОСНОВНОЙ КОД ======
         window.addEventListener('DOMContentLoaded', () => {
             createStarfield();
             checkUserStatus();
@@ -971,6 +1176,8 @@
                 document.getElementById('homePage').classList.add('active');
             } else if (pageName === 'pricing') {
                 document.getElementById('pricingPage').classList.add('active');
+            } else if (pageName === 'faq') {
+                document.getElementById('faqPage').classList.add('active');
             } else if (pageName === 'dashboard') {
                 if (currentUser && currentUser.isAdmin) {
                     document.getElementById('dashboardPage').classList.add('active');
@@ -986,6 +1193,19 @@
                     alert('Нужно войти в аккаунт!');
                 }
             }
+        }
+
+        // FAQ TOGGLE
+        function toggleFaq(element) {
+            const card = element.parentElement;
+            
+            document.querySelectorAll('.faq-card').forEach(faq => {
+                if (faq !== card) {
+                    faq.classList.remove('active');
+                }
+            });
+
+            card.classList.toggle('active');
         }
 
         // PRICING FUNCTIONS
