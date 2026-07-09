@@ -631,7 +631,7 @@
                 <a onclick="showPage('faq')">❓ Вопросы и ответы</a>
                 <a id="navDashboard" onclick="showPage('dashboard')" style="display: none;">📊 Панель</a>
                 <a id="navProfile" onclick="showPage('profile')" style="display: none;">👤 Профиль</a>
-                <a href="https://discord.gg/vsWg2xWd" target="_blank">🎮 Наш Discord</a>
+                <a href="https://discord.gg/W6wuznrh" target="_blank">🎮 Наш Discord</a>
             </div>
             <div class="nav-right">
                 <button class="btn btn-support" onclick="openSupportModal()">🆘 Поддержка</button>
@@ -731,9 +731,8 @@
             <div class="hero-content">
                 <h1>💼 InvokerClient</h1>
                 <p>Профессиональная CRM-система для управления клиентами</p>
-                <div class="cta-buttons">
-                    <button class="btn-primary" onclick="openSignupModal()">🚀 Начать сейчас</button>
-                    <button class="btn-primary" style="background: transparent; color: #64c8ff; border: 2px solid #64c8ff;" onclick="showPage('pricing')">💰 Смотреть цены</button>
+                <div class="cta-buttons" id="heroButtons">
+                    <!-- Кнопки добавятся динамически через JS -->
                 </div>
             </div>
         </section>
@@ -886,7 +885,7 @@
                             <h3>Как оплатить подписку?</h3>
                         </div>
                         <div class="faq-answer">
-                            <p>Оплата производится через нашу поддержку. После выбора тарифа свяжитесь с нами через Telegram (@crokodilus) или Discord (https://discord.gg/vsWg2xWd). Мы поможем с оплатой и активацией доступа.</p>
+                            <p>Оплата производится через нашу поддержку. После выбора тарифа свяжитесь с нами через Telegram (@crokodilus) или Discord (https://discord.gg/W6wuznrh). Мы поможем с оплатой и активацией доступа.</p>
                         </div>
                     </div>
 
@@ -1039,9 +1038,29 @@
             }, 3000);
         }
 
+        // ====== ОБНОВЛЕНИЕ КНОПОК HERO ======
+        function updateHeroButtons() {
+            const heroButtons = document.getElementById('heroButtons');
+            const user = localStorage.getItem('invokerclient_currentUser');
+            
+            if (user) {
+                // Если пользователь залогинен - показываем только кнопку "Смотреть цены"
+                heroButtons.innerHTML = `
+                    <button class="btn-primary" onclick="showPage('pricing')">💰 Смотреть цены</button>
+                `;
+            } else {
+                // Если не залогинен - показываем обе кнопки
+                heroButtons.innerHTML = `
+                    <button class="btn-primary" onclick="openSignupModal()">🚀 Начать сейчас</button>
+                    <button class="btn-primary" style="background: transparent; color: #64c8ff; border: 2px solid #64c8ff;" onclick="showPage('pricing')">💰 Смотреть цены</button>
+                `;
+            }
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             createStarfield();
             checkUserStatus();
+            updateHeroButtons();
         });
 
         function checkUserStatus() {
@@ -1069,6 +1088,8 @@
                 navDashboard.style.display = 'none';
                 navProfile.style.display = 'none';
             }
+            
+            updateHeroButtons();
         }
 
         function showPage(pageName) {
@@ -1118,7 +1139,16 @@
                 return;
             }
             
-            alert(`✅ Спасибо!\n\nВы выбрали план: ${duration}\nСумма: ${price} ₽\n\nДля оплаты свяжитесь с поддержкой:\nTelegram: https://t.me/crokodilus\nDiscord: https://discord.gg/vsWg2xWd`);
+            // Открываем Discord сразу
+            window.open('https://discord.gg/W6wuznrh', '_blank');
+            
+            // Показываем информацию
+            alert(`✅ Спасибо за интерес!\n\n` +
+                  `Вы выбрали план: ${duration}\n` +
+                  `Сумма: ${price} ₽\n\n` +
+                  `🎮 Мы открыли наш Discord сервер!\n` +
+                  `Свяжитесь с поддержкой там для оплаты.\n\n` +
+                  `Ссылка: https://discord.gg/W6wuznrh`);
         }
 
         // SUPPORT FUNCTIONS
@@ -1136,7 +1166,7 @@
         }
 
         function openDiscord() {
-            window.open('https://discord.gg/vsWg2xWd', '_blank');
+            window.open('https://discord.gg/W6wuznrh', '_blank');
             closeSupportModal();
         }
 
