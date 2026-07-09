@@ -19,11 +19,46 @@ if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR);
 }
 
+// Инициализация админа
+function initializeAdmin() {
+    let users = [];
+    if (fs.existsSync(USERS_FILE)) {
+        try {
+            users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+        } catch (e) {
+            users = [];
+        }
+    }
+
+    // Проверяем если админа нет - создаем
+    const adminEmail = 'gridinamarina999@gmail.com';
+    const adminPassword = Buffer.from('q1w2e3334').toString('base64');
+    
+    if (!users.some(u => u.email === adminEmail)) {
+        const admin = {
+            id: Date.now(),
+            name: 'Admin',
+            email: adminEmail,
+            password: adminPassword,
+            registeredAt: new Date().toLocaleString('ru-RU'),
+            lastLogin: null,
+            isAdmin: true
+        };
+        users.push(admin);
+        fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+        console.log('✅ Админ-аккаунт создан!');
+        console.log('📧 Email: gridinamarina999@gmail.com');
+        console.log('🔐 Пароль: q1w2e3334');
+    }
+}
+
+initializeAdmin();
+
 if (!fs.existsSync(USERS_FILE)) {
     fs.writeFileSync(USERS_FILE, JSON.stringify([], null, 2));
 }
 
-// Email конфиг (используем Gmail или другой сервис)
+// Email конфиг
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -79,7 +114,7 @@ app.post('/api/auth/signup', async (req, res) => {
         password: Buffer.from(password).toString('base64'),
         registeredAt: new Date().toLocaleString('ru-RU'),
         lastLogin: null,
-        isAdmin: users.length === 0 // Первый пользователь - админ
+        isAdmin: false // Обычные пользователи не админы
     };
 
     users.push(newUser);
@@ -239,6 +274,11 @@ app.delete('/api/admin/user/:id', (req, res) => {
         return res.status(403).json({ success: false, error: 'Доступ запрещен' });
     }
 
+    // Запрещаем удалять самого себя
+    if (admin.id === userId) {
+        return res.status(400).json({ success: false, error: 'Нельзя удалить самого себя' });
+    }
+
     const initialLength = users.length;
     const updatedUsers = users.filter(u => u.id !== userId);
 
@@ -276,7 +316,12 @@ app.listen(PORT, () => {
 ╔════════════════════════════════════════╗
 ║   InvokerClient Server запущен! 🚀     ║
 ║   Адрес: http://localhost:${PORT}          ║
-║   Admin: админ-панель для первого юзера║
+║                                        ║
+║   👑 АДМИН-ДОСТУП:                    ║
+║   📧 Email: gridinamarina999@gmail.com ║
+║   🔐 Пароль: q1w2e3334                ║
+║                                        ║
+║   После входа админа нажми "📊 Панель"║
 ╚════════════════════════════════════════╝
     `);
 });
