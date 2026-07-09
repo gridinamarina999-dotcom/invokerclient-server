@@ -11,7 +11,6 @@
             background: #0a0e27; 
             color: #e0e0e0; 
             overflow-x: hidden;
-            cursor: none; /* Скрываем стандартный курсор */
         }
         
         ::-webkit-scrollbar { width: 8px; }
@@ -35,17 +34,6 @@
             z-index: 9999;
             transition: all 0.1s ease;
             box-shadow: 0 0 20px rgba(100, 200, 255, 0.5);
-        }
-
-        #cursor-follower {
-            position: fixed;
-            width: 40px;
-            height: 40px;
-            border: 1px solid rgba(100, 200, 255, 0.3);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 9998;
-            transition: all 0.3s ease;
         }
 
         /* ЗВЕЗДОЧКИ НА ФОНЕ */
@@ -233,6 +221,11 @@
             animation: float 3s ease-in-out infinite;
         }
 
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
         .logo:hover { 
             color: #ffffff; 
             transform: scale(1.1) rotate(2deg);
@@ -391,11 +384,6 @@
             left: -300px;
             animation: float 12s ease-in-out infinite reverse, rotate 25s linear infinite reverse;
             z-index: 0;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(50px); }
         }
 
         @keyframes rotate {
@@ -730,6 +718,12 @@
             margin-bottom: 15px;
             animation: fadeIn 1s ease;
         }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         .pricing-name { 
             font-size: 24px; 
             font-weight: 700; 
@@ -969,11 +963,6 @@
             background: rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(10px);
             animation: fadeIn 0.3s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
         }
         
         .modal-content {
@@ -1413,15 +1402,13 @@
             .pricing-card.popular { transform: scale(1); }
             .users-table { font-size: 12px; }
             .support-options { grid-template-columns: 1fr; }
-            #cursor, #cursor-follower { display: none; }
-            body { cursor: auto; }
+            #cursor { display: none; }
         }
     </style>
 </head>
 <body>
     <!-- КАСТОМНЫЙ КУРСОР -->
     <div id="cursor"></div>
-    <div id="cursor-follower"></div>
 
     <!-- ЗВЕЗДОЧКИ НА ФОНЕ -->
     <div id="starfield"></div>
@@ -1542,9 +1529,7 @@
             <div class="hero-content">
                 <h1>💼 InvokerClient</h1>
                 <p>Профессиональная CRM-система для управления клиентами</p>
-                <div class="cta-buttons" id="heroButtons">
-                    <!-- Кнопки добавятся динамически через JS -->
-                </div>
+                <div class="cta-buttons" id="heroButtons"></div>
             </div>
         </section>
 
@@ -1826,19 +1811,12 @@
 
         // ====== КАСТОМНЫЙ КУРСОР ======
         const cursor = document.getElementById('cursor');
-        const cursorFollower = document.getElementById('cursor-follower');
 
         document.addEventListener('mousemove', (e) => {
             cursor.style.left = e.clientX + 'px';
             cursor.style.top = e.clientY + 'px';
-            
-            setTimeout(() => {
-                cursorFollower.style.left = e.clientX + 'px';
-                cursorFollower.style.top = e.clientY + 'px';
-            }, 100);
         });
 
-        // Увеличение курсора при наведении на кликабельные элементы
         document.querySelectorAll('a, button, .btn, .feature-card, .pricing-card').forEach(el => {
             el.addEventListener('mouseenter', () => {
                 cursor.style.transform = 'scale(1.5)';
