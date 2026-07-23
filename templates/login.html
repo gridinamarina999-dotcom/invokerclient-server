@@ -14,7 +14,10 @@
 
     <label>
       Пароль
-      <input type="password" name="password" required autocomplete="current-password" />
+      <div class="password-field">
+        <input id="login-password" type="password" name="password" required autocomplete="current-password" />
+        <button type="button" class="password-toggle" data-password-toggle="login-password" aria-label="Показать пароль">Показать</button>
+      </div>
     </label>
 
     <button class="btn btn-primary" type="submit">Войти</button>

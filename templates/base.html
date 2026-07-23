@@ -7,19 +7,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=5" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=6" />
 </head>
 <body>
   <div class="page-bg" aria-hidden="true">
-    <canvas id="fx-canvas" class="fx-canvas"></canvas>
     <div class="fog fog-a"></div>
     <div class="fog fog-b"></div>
-    <div class="fog fog-c"></div>
     <div class="grid-overlay"></div>
-    <div class="scanlines"></div>
   </div>
-
-  <div class="cursor-glow" aria-hidden="true"></div>
 
   <header class="site-header">
     <a class="brand" href="{{ url_for('index') }}">
@@ -75,6 +70,6 @@
     </div>
   </footer>
 
-  <script src="{{ url_for('static', filename='js/main.js') }}?v=5"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}?v=6"></script>
 </body>
 </html>

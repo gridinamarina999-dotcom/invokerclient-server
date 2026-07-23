@@ -52,9 +52,8 @@ body {
 .fog {
   position: absolute;
   border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.55;
-  animation: drift 14s ease-in-out infinite alternate;
+  filter: blur(60px);
+  opacity: 0.4;
 }
 
 .fog-a {
@@ -134,7 +133,6 @@ body {
     linear-gradient(90deg, rgba(167, 139, 250, 0.04) 1px, transparent 1px);
   background-size: 64px 64px;
   mask-image: radial-gradient(ellipse at 50% 30%, black 10%, transparent 70%);
-  animation: grid-drift 28s linear infinite;
 }
 
 .site-header,
@@ -179,7 +177,6 @@ main,
   font-size: 0.85rem;
   background: linear-gradient(135deg, var(--purple), var(--purple-deep));
   box-shadow: 0 0 24px var(--purple-glow);
-  animation: brand-pulse 2.8s ease-in-out infinite;
 }
 
 .brand-text {
@@ -258,12 +255,7 @@ main,
 }
 
 .btn-shine::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(110deg, transparent 20%, rgba(255, 255, 255, 0.35) 45%, transparent 70%);
-  transform: translateX(-120%);
-  animation: shine 3.2s ease-in-out infinite;
+  content: none;
 }
 
 .btn-lg {
@@ -275,7 +267,6 @@ main,
   background: linear-gradient(135deg, var(--purple-bright), var(--purple-deep));
   color: #fff;
   box-shadow: 0 10px 30px var(--purple-glow);
-  animation: btn-glow 2.6s ease-in-out infinite;
 }
 
 .btn-primary:hover {
@@ -336,7 +327,7 @@ main,
   position: absolute;
   border: 1px solid rgba(167, 139, 250, 0.18);
   border-radius: 50%;
-  animation: ring-pulse 6s ease-out infinite;
+  opacity: 0.35;
 }
 
 .ring-1 { width: min(70vw, 520px); height: min(70vw, 520px); }
@@ -557,7 +548,6 @@ main,
   color: #fff;
   background: linear-gradient(135deg, rgba(139, 92, 246, 0.9), rgba(76, 29, 149, 0.9));
   box-shadow: 0 0 24px rgba(139, 92, 246, 0.35);
-  animation: float-soft 3.5s ease-in-out infinite;
 }
 
 .feature-block h3 {
@@ -612,7 +602,6 @@ main,
     linear-gradient(160deg, rgba(109, 40, 217, 0.35), rgba(18, 14, 28, 0.85));
   border-color: rgba(167, 139, 250, 0.45);
   box-shadow: 0 20px 50px rgba(109, 40, 217, 0.35);
-  animation: featured-pulse 3.4s ease-in-out infinite;
 }
 
 .price-badge {
@@ -627,7 +616,6 @@ main,
   background: linear-gradient(135deg, var(--purple-bright), var(--purple-deep));
   padding: 6px 10px;
   border-radius: var(--radius-pill);
-  animation: badge-bob 2.2s ease-in-out infinite;
 }
 
 .price-term {
@@ -744,6 +732,35 @@ main,
 .auth-form input:focus {
   outline: 2px solid rgba(139, 92, 246, 0.45);
   border-color: var(--purple);
+}
+
+.password-field {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.password-field input {
+  flex: 1;
+  min-width: 0;
+}
+
+.password-toggle {
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 0 14px;
+  background: rgba(139, 92, 246, 0.12);
+  color: var(--purple-bright);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.password-toggle:hover {
+  background: rgba(139, 92, 246, 0.22);
+  color: #fff;
 }
 
 .form-alt {

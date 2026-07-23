@@ -14,12 +14,18 @@
 
     <label>
       Пароль
-      <input type="password" name="password" required minlength="6" autocomplete="new-password" />
+      <div class="password-field">
+        <input id="reg-password" type="password" name="password" required minlength="6" autocomplete="new-password" />
+        <button type="button" class="password-toggle" data-password-toggle="reg-password" aria-label="Показать пароль">Показать</button>
+      </div>
     </label>
 
     <label>
       Повтор пароля
-      <input type="password" name="password2" required minlength="6" autocomplete="new-password" />
+      <div class="password-field">
+        <input id="reg-password2" type="password" name="password2" required minlength="6" autocomplete="new-password" />
+        <button type="button" class="password-toggle" data-password-toggle="reg-password2" aria-label="Показать пароль">Показать</button>
+      </div>
     </label>
 
     <button class="btn btn-primary" type="submit">Зарегистрироваться</button>
