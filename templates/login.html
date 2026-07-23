@@ -19,6 +19,7 @@
 
     <button class="btn btn-primary" type="submit">Войти</button>
     <p class="form-alt">Нет аккаунта? <a href="{{ url_for('register') }}">Регистрация</a></p>
+    <p class="form-alt">Не пришло письмо? <a href="{{ url_for('resend_verification') }}">Отправить снова</a></p>
   </form>
 </section>
 {% endblock %}
