@@ -766,9 +766,21 @@ main,
   font-size: 0.9rem;
 }
 
-.admin-head {
-  margin-bottom: 24px;
+.setup-steps {
+  margin: 0 0 18px 18px;
+  color: var(--muted);
+  display: grid;
+  gap: 8px;
 }
+
+.setup-steps a {
+  color: var(--purple-bright);
+}
+
+.mail-setup h2 {
+  margin-bottom: 8px;
+}
+
 
 .table-wrap {
   overflow-x: auto;

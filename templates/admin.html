@@ -8,6 +8,36 @@
     <p>Кто зарегистрировался и когда. Всего пользователей: {{ users|length }}</p>
   </div>
 
+  <div class="mail-setup auth-form" style="max-width:640px;margin:0 0 36px;">
+    <h2 style="font-family:var(--font-display);font-size:1.35rem;">Почта для подтверждения</h2>
+    {% if mail_configured %}
+      <p class="form-lead" style="color:var(--ok);">Почта настроена — письма уходят автоматически.</p>
+    {% else %}
+      <p class="form-lead" style="color:var(--warn);">Почта ещё не настроена. Сделай 3 шага ниже — один раз.</p>
+    {% endif %}
+
+    <ol class="setup-steps">
+      <li>Открой ссылку Google (нужен вход в тот же Gmail):
+        <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener noreferrer">Создать пароль приложения</a>
+      </li>
+      <li>Если попросит — включи двухэтапную проверку, потом снова открой ссылку.</li>
+      <li>Создай пароль для «Почта», скопируй 16 символов и вставь сюда ↓</li>
+    </ol>
+
+    <form method="post" action="{{ url_for('admin_panel') }}">
+      <input type="hidden" name="action" value="save_mail" />
+      <label>
+        Gmail, с которого слать письма
+        <input type="email" name="mail_username" value="{{ mail_username }}" required />
+      </label>
+      <label>
+        Пароль приложения Google {% if mail_password_set %}(уже сохранён — вставь новый, чтобы заменить){% endif %}
+        <input type="password" name="mail_password" placeholder="xxxx xxxx xxxx xxxx" autocomplete="new-password" />
+      </label>
+      <button class="btn btn-primary" type="submit">Сохранить и проверить отправкой</button>
+    </form>
+  </div>
+
   <div class="table-wrap">
     <table class="users-table">
       <thead>
@@ -17,6 +47,7 @@
           <th>Дата регистрации (UTC)</th>
           <th>Почта подтверждена</th>
           <th>Роль</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -27,10 +58,19 @@
             <td>{{ user.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
             <td>{% if user.is_verified %}Да{% else %}Нет{% endif %}</td>
             <td>{% if user.is_admin %}Админ{% else %}Пользователь{% endif %}</td>
+            <td>
+              {% if not user.is_verified and not user.is_admin %}
+                <form method="post" action="{{ url_for('admin_panel') }}" style="display:inline;">
+                  <input type="hidden" name="action" value="verify_user" />
+                  <input type="hidden" name="user_id" value="{{ user.id }}" />
+                  <button class="btn btn-ghost" type="submit" style="padding:6px 12px;font-size:0.85rem;">Подтвердить</button>
+                </form>
+              {% endif %}
+            </td>
           </tr>
         {% else %}
           <tr>
-            <td colspan="5">Пользователей пока нет.</td>
+            <td colspan="6">Пользователей пока нет.</td>
           </tr>
         {% endfor %}
       </tbody>

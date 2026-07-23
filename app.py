@@ -72,6 +72,32 @@ class User(db.Model):
         return check_password_hash(self.password_hash, password)
 
 
+class AppSetting(db.Model):
+    """Настройки сайта (почта и т.п.) — хранятся в БД, без Railway Variables."""
+
+    __tablename__ = "app_settings"
+
+    key = db.Column(db.String(64), primary_key=True)
+    value = db.Column(db.Text, nullable=False, default="")
+
+
+def get_setting(key: str, default: str = "") -> str:
+    row = db.session.get(AppSetting, key)
+    if row and row.value.strip():
+        return row.value.strip()
+    return (os.getenv(key, default) or default).strip()
+
+
+def set_setting(key: str, value: str) -> None:
+    row = db.session.get(AppSetting, key)
+    if row is None:
+        row = AppSetting(key=key, value=value)
+        db.session.add(row)
+    else:
+        row.value = value
+    db.session.commit()
+
+
 def is_valid_email(email: str) -> bool:
     """Проверка формата и существования домена почты (MX или A)."""
     if not EMAIL_RE.match(email):
@@ -96,42 +122,48 @@ def is_valid_email(email: str) -> bool:
 
 
 def build_verify_url(token: str) -> str:
-    base_url = os.getenv("BASE_URL", "").rstrip("/")
-    if base_url:
-        return f"{base_url}/verify/{token}"
-    # fallback, если BASE_URL не задан
-    return url_for("verify_email", token=token, _external=True)
+    # 1) настройка из админки / env  2) автоматический URL текущего сайта
+    base_url = get_setting("BASE_URL", os.getenv("BASE_URL", "")).rstrip("/")
+    if not base_url:
+        try:
+            base_url = request.url_root.rstrip("/")
+        except RuntimeError:
+            base_url = "http://127.0.0.1:5000"
+    return f"{base_url}/verify/{token}"
+
+
+def get_mail_config() -> dict[str, str]:
+    """Берёт SMTP из БД (админка), иначе из переменных окружения."""
+    username = get_setting("MAIL_USERNAME", os.getenv("MAIL_USERNAME", ADMIN_EMAIL))
+    password = get_setting("MAIL_PASSWORD", os.getenv("MAIL_PASSWORD", ""))
+    return {
+        "server": get_setting("MAIL_SERVER", os.getenv("MAIL_SERVER", "smtp.gmail.com")),
+        "port": get_setting("MAIL_PORT", os.getenv("MAIL_PORT", "587")),
+        "use_tls": get_setting("MAIL_USE_TLS", os.getenv("MAIL_USE_TLS", "1")),
+        "username": username,
+        "password": password,
+        "sender": get_setting("MAIL_DEFAULT_SENDER", os.getenv("MAIL_DEFAULT_SENDER", username))
+        or username,
+    }
 
 
 def mail_configured() -> bool:
-    return bool(
-        os.getenv("MAIL_USERNAME", "").strip()
-        and os.getenv("MAIL_PASSWORD", "").strip()
-    )
+    cfg = get_mail_config()
+    return bool(cfg["username"] and cfg["password"])
 
 
 def send_verification_email(to_email: str, token: str) -> None:
-    """
-    Отправляет письмо со ссылкой подтверждения через SMTP (Gmail и др.).
-    Бросает исключение, если отправка не удалась.
-    """
-    if not mail_configured():
+    """Отправляет письмо со ссылкой подтверждения через SMTP."""
+    cfg = get_mail_config()
+    if not cfg["username"] or not cfg["password"]:
         raise RuntimeError(
-            "Почта не настроена: задай MAIL_USERNAME и MAIL_PASSWORD "
-            "(для Gmail — пароль приложения) в переменных окружения Railway."
+            "Почта ещё не настроена. Зайди в админку → блок «Почта» и сохрани пароль приложения Gmail."
         )
 
     verify_url = build_verify_url(token)
-    mail_server = os.getenv("MAIL_SERVER", "smtp.gmail.com").strip()
-    mail_username = os.getenv("MAIL_USERNAME", "").strip()
-    mail_password = os.getenv("MAIL_PASSWORD", "").strip()
-    mail_sender = os.getenv("MAIL_DEFAULT_SENDER", mail_username).strip() or mail_username
-    port = int(os.getenv("MAIL_PORT", "587"))
-    use_tls = os.getenv("MAIL_USE_TLS", "1") == "1"
-
     msg = EmailMessage()
     msg["Subject"] = "Подтверждение регистрации — InvokerClient"
-    msg["From"] = formataddr(("InvokerClient", mail_sender))
+    msg["From"] = formataddr(("InvokerClient", cfg["sender"]))
     msg["To"] = to_email
     msg.set_content(
         "Здравствуйте!\n\n"
@@ -166,10 +198,12 @@ def send_verification_email(to_email: str, token: str) -> None:
         subtype="html",
     )
 
-    with smtplib.SMTP(mail_server, port, timeout=30) as smtp:
+    port = int(cfg["port"] or "587")
+    use_tls = cfg["use_tls"] == "1"
+    with smtplib.SMTP(cfg["server"], port, timeout=30) as smtp:
         if use_tls:
             smtp.starttls()
-        smtp.login(mail_username, mail_password)
+        smtp.login(cfg["username"], cfg["password"])
         smtp.send_message(msg)
 
 
@@ -395,11 +429,73 @@ def logout():
     return redirect(url_for("index"))
 
 
-@app.route("/admin")
+@app.route("/admin", methods=["GET", "POST"])
 @admin_required
 def admin_panel():
+    if request.method == "POST":
+        action = request.form.get("action") or ""
+
+        if action == "save_mail":
+            username = (request.form.get("mail_username") or "").strip()
+            password = (request.form.get("mail_password") or "").strip()
+            # убираем пробелы из пароля приложения Gmail (Google показывает с пробелами)
+            password = password.replace(" ", "")
+            set_setting("MAIL_SERVER", "smtp.gmail.com")
+            set_setting("MAIL_PORT", "587")
+            set_setting("MAIL_USE_TLS", "1")
+            set_setting("MAIL_USERNAME", username)
+            if password:
+                set_setting("MAIL_PASSWORD", password)
+            set_setting("MAIL_DEFAULT_SENDER", username)
+            set_setting("BASE_URL", request.url_root.rstrip("/"))
+            flash("Настройки почты сохранены.", "success")
+
+            if password or get_setting("MAIL_PASSWORD"):
+                try:
+                    # тестовое письмо самому себе
+                    token = secrets.token_urlsafe(8)
+                    send_verification_email(username, token)
+                    flash("Тестовое письмо отправлено на твою почту. Проверь «Входящие» и «Спам».", "success")
+                except Exception as exc:
+                    print(f"[MAIL TEST ERROR] {exc}")
+                    flash(
+                        f"Сохранено, но отправка не прошла: {exc}. "
+                        "Нужен пароль приложения Google, не обычный пароль.",
+                        "error",
+                    )
+            return redirect(url_for("admin_panel"))
+
+        if action == "verify_user":
+            user_id = request.form.get("user_id")
+            user = db.session.get(User, int(user_id)) if user_id else None
+            if user and not user.is_admin:
+                user.is_verified = True
+                user.verification_token = None
+                db.session.commit()
+                flash(f"Почта подтверждена вручную: {user.email}", "success")
+            return redirect(url_for("admin_panel"))
+
     users = User.query.order_by(User.created_at.desc()).all()
-    return render_template("admin.html", users=users)
+    cfg = get_mail_config()
+    return render_template(
+        "admin.html",
+        users=users,
+        mail_username=cfg["username"],
+        mail_configured=mail_configured(),
+        mail_password_set=bool(cfg["password"]),
+    )
+
+
+@app.route("/admin/verify/<int:user_id>", methods=["POST"])
+@admin_required
+def admin_verify_user(user_id: int):
+    user = db.session.get(User, user_id)
+    if user and not user.is_admin:
+        user.is_verified = True
+        user.verification_token = None
+        db.session.commit()
+        flash(f"Подтверждено: {user.email}", "success")
+    return redirect(url_for("admin_panel"))
 
 
 with app.app_context():
