@@ -162,7 +162,8 @@ def send_verification_email(to_email: str, token: str) -> None:
     cfg = get_mail_config()
     if not cfg["username"] or not cfg["password"]:
         raise RuntimeError(
-            "Почта ещё не настроена. Зайди в админку → блок «Почта» и сохрани пароль приложения Gmail."
+            "Почта ещё не настроена. Зайди в админку - блок Почта "
+            "и сохрани пароль приложения Gmail."
         )
 
     verify_url = build_verify_url(token)
@@ -224,7 +225,7 @@ def send_verification_email(to_email: str, token: str) -> None:
             return
         except Exception as exc:
             last_error = exc
-            print(f"[MAIL] fail {host}:{port} → {exc}")
+            print(f"[MAIL] fail {host}:{port} -> {exc!r}")
 
     raise RuntimeError(str(last_error) if last_error else "Неизвестная ошибка SMTP")
 
@@ -341,13 +342,15 @@ def register():
         try:
             send_verification_email(email, token)
         except Exception as exc:
-            print(f"[MAIL ERROR] {exc}")
-            # Аккаунт оставляем — админ может подтвердить вручную
+            # Безопасный лог: на Railway/Windows print с unicode может уронить ответ 500
+            try:
+                print("[MAIL ERROR]", repr(exc))
+            except Exception:
+                pass
             flash(
                 "Аккаунт создан, но письмо не отправилось. "
-                "Зайди в админку → Почта (сохрани пароль приложения снова) "
-                "или подтверди пользователя кнопкой «Подтвердить». "
-                f"Ошибка: {exc}",
+                "Зайди в админку в блок Почта (сохрани пароль приложения снова) "
+                "или подтверди пользователя кнопкой Подтвердить.",
                 "warning",
             )
             return render_template("verify_notice.html", email=email)
