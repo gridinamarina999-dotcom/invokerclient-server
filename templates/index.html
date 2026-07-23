@@ -3,41 +3,55 @@
 
 {% block content %}
 <section class="hero">
+  <div class="hero-rings" aria-hidden="true">
+    <span class="ring ring-1"></span>
+    <span class="ring ring-2"></span>
+    <span class="ring ring-3"></span>
+  </div>
   <div class="hero-inner">
-    <p class="hero-brand">InvokerClient</p>
-    <h1>Командуй доступом.<br />Работай с InvokerClient.</h1>
+    <p class="hero-brand"><span class="pulse-dot"></span>InvokerClient</p>
+    <h1 class="hero-title">
+      <span class="line">Командуй доступом.</span>
+      <span class="line accent">Работай с InvokerClient.</span>
+    </h1>
     <p class="lead">
       Платформа для аккаунтов и контроля доступа.
       Регистрация и подтверждение почты — в одном месте.
     </p>
     <div class="hero-cta">
       {% if current_user %}
-        <a class="btn btn-primary btn-lg" href="{{ url_for('index') }}#pricing">Смотреть цены</a>
+        <a class="btn btn-primary btn-lg btn-shine" href="{{ url_for('index') }}#pricing">Смотреть цены</a>
         <a class="btn btn-ghost btn-lg" href="{{ url_for('logout') }}">Выйти</a>
       {% else %}
-        <a class="btn btn-primary btn-lg" href="{{ url_for('register') }}">Создать аккаунт</a>
+        <a class="btn btn-primary btn-lg btn-shine" href="{{ url_for('register') }}">Создать аккаунт</a>
         <a class="btn btn-ghost btn-lg" href="{{ url_for('login') }}">Войти в аккаунт</a>
       {% endif %}
     </div>
   </div>
+  <div class="scroll-hint" aria-hidden="true">
+    <span></span>
+  </div>
 </section>
 
 <section class="features" id="features">
-  <div class="section-head">
+  <div class="section-head reveal">
     <h2>Создан для контроля.<br />Настроен на точность.</h2>
     <p class="section-lead">Всё необходимое для старта — без лишнего шума.</p>
   </div>
 
   <div class="feature-grid">
     <article class="feature-block">
+      <div class="icon-orb">01</div>
       <h3>Регистрация</h3>
       <p>Почта и пароль сохраняются в базе. Быстрый старт за минуту.</p>
     </article>
     <article class="feature-block">
+      <div class="icon-orb">02</div>
       <h3>Проверка почты</h3>
       <p>После регистрации — ссылка подтверждения. Без неё вход закрыт.</p>
     </article>
     <article class="feature-block">
+      <div class="icon-orb">03</div>
       <h3>Личный доступ</h3>
       <p>После подтверждения почты можно войти в аккаунт и пользоваться сервисом.</p>
     </article>
@@ -45,7 +59,7 @@
 </section>
 
 <section class="pricing" id="pricing">
-  <div class="section-head">
+  <div class="section-head reveal">
     <h2>Цены</h2>
     <p class="section-lead">Выбери срок доступа под себя.</p>
   </div>
@@ -76,7 +90,7 @@
 </section>
 
 <section class="support" id="support">
-  <div class="section-head">
+  <div class="section-head reveal">
     <h2>Поддержка</h2>
     <p class="section-lead">Напиши нам — ответим в Telegram или Discord.</p>
   </div>
@@ -102,13 +116,14 @@
   </div>
 </section>
 
-<section class="cta-band">
+<section class="cta-band reveal">
+  <div class="cta-glow" aria-hidden="true"></div>
   <h2>Готов начать?</h2>
   <p>Создай аккаунт и подтверди почту — дальше всё просто.</p>
   {% if not current_user %}
-    <a class="btn btn-primary btn-lg" href="{{ url_for('register') }}">Создать аккаунт</a>
+    <a class="btn btn-primary btn-lg btn-shine" href="{{ url_for('register') }}">Создать аккаунт</a>
   {% else %}
-    <a class="btn btn-primary btn-lg" href="{{ url_for('index') }}">На главную</a>
+    <a class="btn btn-primary btn-lg btn-shine" href="{{ url_for('index') }}">На главную</a>
   {% endif %}
 </section>
 {% endblock %}
