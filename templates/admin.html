@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Админ-панель — InvokerClient{% endblock %}
+
+{% block content %}
+<section class="admin-section">
+  <div class="admin-head">
+    <h1>Админ-панель</h1>
+    <p>Кто зарегистрировался и когда. Всего пользователей: {{ users|length }}</p>
+  </div>
+
+  <div class="table-wrap">
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Почта</th>
+          <th>Дата регистрации (UTC)</th>
+          <th>Почта подтверждена</th>
+          <th>Роль</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+          <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+            <td>{% if user.is_verified %}Да{% else %}Нет{% endif %}</td>
+            <td>{% if user.is_admin %}Админ{% else %}Пользователь{% endif %}</td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="5">Пользователей пока нет.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

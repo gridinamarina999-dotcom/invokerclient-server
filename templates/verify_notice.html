@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Подтверждение почты — InvokerClient{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+  <div class="auth-form notice">
+    <h1>Проверьте почту</h1>
+    <p class="form-lead">
+      Мы отправили ссылку подтверждения на <strong>{{ email }}</strong>.
+      Без подтверждения войти нельзя.
+    </p>
+
+    {% if verify_url %}
+      <p class="dev-hint">SMTP пока не настроен. Для теста откройте ссылку вручную:</p>
+      <a class="verify-link" href="{{ verify_url }}">{{ verify_url }}</a>
+    {% endif %}
+
+    <a class="btn btn-ghost" href="{{ url_for('login') }}">К странице входа</a>
+  </div>
+</section>
+{% endblock %}
