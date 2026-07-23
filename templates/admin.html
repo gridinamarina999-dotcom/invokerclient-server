@@ -13,9 +13,9 @@
     {% if mail_configured %}
       <p class="form-lead" style="color:var(--ok);">Почта настроена — письма уходят автоматически.</p>
     {% else %}
-      <p class="form-lead" style="color:var(--warn);">Почта ещё не настроена. Сделай 3 шага ниже — один раз.</p>
+      <p class="form-lead" style="color:var(--warn);">Почта не настроена или сбросилась после обновления сайта. Сохрани пароль снова.</p>
     {% endif %}
-
+    <p class="form-lead">Важно: после каждого деплоя на Railway без PostgreSQL настройки могут пропасть — просто сохрани пароль приложения ещё раз.</p>
     <ol class="setup-steps">
       <li>Открой ссылку Google (нужен вход в тот же Gmail):
         <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener noreferrer">Создать пароль приложения</a>

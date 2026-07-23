@@ -82,10 +82,14 @@ class AppSetting(db.Model):
 
 
 def get_setting(key: str, default: str = "") -> str:
+    """Сначала env (Railway Variables не стираются), потом БД (админка)."""
+    env_val = (os.getenv(key, "") or "").strip()
+    if env_val:
+        return env_val
     row = db.session.get(AppSetting, key)
     if row and row.value.strip():
         return row.value.strip()
-    return (os.getenv(key, default) or default).strip()
+    return default.strip()
 
 
 def set_setting(key: str, value: str) -> None:
@@ -122,8 +126,8 @@ def is_valid_email(email: str) -> bool:
 
 
 def build_verify_url(token: str) -> str:
-    # 1) настройка из админки / env  2) автоматический URL текущего сайта
-    base_url = get_setting("BASE_URL", os.getenv("BASE_URL", "")).rstrip("/")
+    # 1) env / админка  2) автоматический URL текущего сайта
+    base_url = get_setting("BASE_URL", "").rstrip("/")
     if not base_url:
         try:
             base_url = request.url_root.rstrip("/")
@@ -133,17 +137,18 @@ def build_verify_url(token: str) -> str:
 
 
 def get_mail_config() -> dict[str, str]:
-    """Берёт SMTP из БД (админка), иначе из переменных окружения."""
-    username = get_setting("MAIL_USERNAME", os.getenv("MAIL_USERNAME", ADMIN_EMAIL))
-    password = get_setting("MAIL_PASSWORD", os.getenv("MAIL_PASSWORD", ""))
+    """SMTP: Railway Variables или настройки из админки."""
+    username = get_setting("MAIL_USERNAME", ADMIN_EMAIL)
+    password = get_setting("MAIL_PASSWORD", "")
+    # Gmail app password часто копируют с пробелами
+    password = password.replace(" ", "")
     return {
-        "server": get_setting("MAIL_SERVER", os.getenv("MAIL_SERVER", "smtp.gmail.com")),
-        "port": get_setting("MAIL_PORT", os.getenv("MAIL_PORT", "587")),
-        "use_tls": get_setting("MAIL_USE_TLS", os.getenv("MAIL_USE_TLS", "1")),
+        "server": get_setting("MAIL_SERVER", "smtp.gmail.com"),
+        "port": get_setting("MAIL_PORT", "587"),
+        "use_tls": get_setting("MAIL_USE_TLS", "1"),
         "username": username,
         "password": password,
-        "sender": get_setting("MAIL_DEFAULT_SENDER", os.getenv("MAIL_DEFAULT_SENDER", username))
-        or username,
+        "sender": get_setting("MAIL_DEFAULT_SENDER", username) or username,
     }
 
 
@@ -153,7 +158,7 @@ def mail_configured() -> bool:
 
 
 def send_verification_email(to_email: str, token: str) -> None:
-    """Отправляет письмо со ссылкой подтверждения через SMTP."""
+    """Отправляет письмо со ссылкой подтверждения через SMTP (587 или 465)."""
     cfg = get_mail_config()
     if not cfg["username"] or not cfg["password"]:
         raise RuntimeError(
@@ -198,13 +203,30 @@ def send_verification_email(to_email: str, token: str) -> None:
         subtype="html",
     )
 
-    port = int(cfg["port"] or "587")
-    use_tls = cfg["use_tls"] == "1"
-    with smtplib.SMTP(cfg["server"], port, timeout=30) as smtp:
-        if use_tls:
-            smtp.starttls()
-        smtp.login(cfg["username"], cfg["password"])
-        smtp.send_message(msg)
+    last_error: Exception | None = None
+    # Пробуем STARTTLS :587, затем SSL :465
+    attempts = [
+        (cfg["server"], int(cfg["port"] or "587"), True, False),
+        (cfg["server"], 465, False, True),
+    ]
+    for host, port, starttls, ssl_mode in attempts:
+        try:
+            if ssl_mode:
+                with smtplib.SMTP_SSL(host, port, timeout=30) as smtp:
+                    smtp.login(cfg["username"], cfg["password"])
+                    smtp.send_message(msg)
+            else:
+                with smtplib.SMTP(host, port, timeout=30) as smtp:
+                    if starttls:
+                        smtp.starttls()
+                    smtp.login(cfg["username"], cfg["password"])
+                    smtp.send_message(msg)
+            return
+        except Exception as exc:
+            last_error = exc
+            print(f"[MAIL] fail {host}:{port} → {exc}")
+
+    raise RuntimeError(str(last_error) if last_error else "Неизвестная ошибка SMTP")
 
 
 def current_user() -> User | None:
@@ -298,7 +320,6 @@ def register():
             return render_template("register.html")
 
         token = secrets.token_urlsafe(32)
-        created_new = False
 
         if existing and not existing.is_verified:
             # Повторная регистрация неподтверждённого аккаунта — обновляем пароль и шлём письмо снова
@@ -314,7 +335,6 @@ def register():
             )
             user.set_password(password)
             db.session.add(user)
-            created_new = True
 
         db.session.commit()
 
@@ -322,15 +342,15 @@ def register():
             send_verification_email(email, token)
         except Exception as exc:
             print(f"[MAIL ERROR] {exc}")
-            if created_new:
-                db.session.delete(user)
-                db.session.commit()
+            # Аккаунт оставляем — админ может подтвердить вручную
             flash(
-                "Не удалось отправить письмо подтверждения. "
-                "Проверьте настройки почты на сервере или попробуйте позже.",
-                "error",
+                "Аккаунт создан, но письмо не отправилось. "
+                "Зайди в админку → Почта (сохрани пароль приложения снова) "
+                "или подтверди пользователя кнопкой «Подтвердить». "
+                f"Ошибка: {exc}",
+                "warning",
             )
-            return render_template("register.html")
+            return render_template("verify_notice.html", email=email)
 
         flash(
             "Регистрация прошла успешно. Мы отправили письмо — откройте ссылку внутри.",
